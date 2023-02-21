@@ -1,0 +1,55 @@
+%{
+	//Compilation
+	//lex -v exemple0.lex
+	//gcc -Wall lex.yy.c -o analyseur -lfl
+#include <stdio.h>
+
+%}
+%START VCVE EJ ER EU EUF ERF EJF ARM DATE DESC FQ
+%%
+"BEGIN:VCALENDAR" {printf("debut calendrier\n"); BEGIN VCVE;}
+
+<VCVE>.|\n|\t;
+"BEGIN:VEVENT" {printf("debut évenement\n"); BEGIN DATE;}
+<DATE>"DTSTART:" {printf("intro heure début evt unique\n"); BEGIN EU;}
+"DTEND:" {printf("intro heure fin evt unique\n"); BEGIN EUF;}
+"UNTIL=" {printf("intro limite\n"); BEGIN EU;}
+
+"DTSTART;TZID="([A-Z][a-z]*("/"([A-Z][a-z]*(":")))) {printf("intro heure debut evt repetitif\n"); BEGIN ER;}
+"DTEND;TZID="([A-Z][a-z]*("/"([A-Z][a-z]*(":")))) {printf("intro heure fin evt repetitif\n"); BEGIN ERF;}
+
+"DTSTART;VALUE=DATE:" {printf("intro heure début evt journée\n"); BEGIN EJ;}
+"DTEND;VALUE=DATE:" {printf("intro heure fin evt journée\n"); BEGIN EJF;}
+
+<EJ>[0-9]{8} {printf("date evt journée: %s \n", yytext); BEGIN VCVE;}
+<ER>[0-9]{8}("T"([0-9]{6})) {printf("date et heure evt repetitif: %s \n", yytext); BEGIN VCVE;}
+<EU>[0-9]{8}\T[0-9]{6}\Z {printf("date et heure evt unique: %s \n", yytext); BEGIN VCVE;}
+<EUF>[0-9]{8}\T[0-9]{6}\Z {printf("date et heure evt unique: %s \n", yytext); BEGIN DESC;}
+<ERF>[0-9]{8}("T"([0-9]{6})) {printf("date et heure evt repetitif: %s \n", yytext); BEGIN DESC;}
+<EJF>[0-9]{8} {printf("date evt journée: %s \n", yytext); BEGIN DESC;}
+
+
+
+<DESC>.|"DESCRIPTION:" {printf("intro description\n"); BEGIN VCVE;}
+^"LOCATION:" {printf("intro lieu\n");}
+"SUMMARY:" {printf("intro titre\n");}
+"END:VEVENT" {printf("fin événement\n");}
+
+"BEGIN:VALARM" {printf("début alarme\n"); BEGIN VCVE;}
+"TRIGGER:" {printf("intro position alarme\n"); BEGIN ARM;}
+<ARM>"-"([A-Z0-9]*) {printf("position alarme:%s \n", yytext); BEGIN VCVE;}
+
+"END:VALARM" {printf("fin alarme\n");}
+
+
+
+
+
+
+
+
+%%
+
+
+
+
