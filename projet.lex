@@ -29,7 +29,7 @@ FREQUENCE ("DAILY"|"MONTHLY"|"WEEKLY"|"YEARLY")
 <DATE>"DTSTART:" {printf("intro heure début evt unique\n"); BEGIN EU;}
 <ARM>"-"([A-Z0-9]*) {printf("position alarme:%s \n", yytext); BEGIN 0;}
 <VEVENT>"DESCRIPTION:" {printf("intro description\n"); BEGIN DESC;}
-<DESC>(([0-9]+(" "[a-zéèàëêöôâ]+)+)"\\, "[A-Za-zéèàëêöôâ]+)|(([A-Za-zéèàëêöôâ]+" ")*[A-Za-zéèàëêöôâ]+)|"\0" {printf("Lieu, description ou titre : %s \n", yytext); BEGIN 0;}
+<DESC>(([0-9]+(" "[a-zéèàëêöôâ]+)+)"\\, "[A-Za-zéèàëêöôâ]+)|(([A-Za-zéèàëêöôâ]+" ")*[A-Za-zéèàëêöôâ]+)|""/. {printf("Lieu, description ou titre : %s \n", yytext); BEGIN 0;}
 
 
 
