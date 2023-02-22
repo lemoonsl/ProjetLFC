@@ -18,10 +18,7 @@ LISTE_JOURS(("MO"|"TU"|"WE"|"TH"|"FR"|"SA"|"SU"),)*("MO"|"TU"|"WE"|"TH"|"FR"|"SA
 DATE_EVT_JOURNEE [0-9]{8}
 FREQUENCE ("DAILY"|"MONTHLY"|"WEEKLY"|"YEARLY")
 
-LIEU ([0-9]+" "([a-z]" ")*[a-z])"\,"[A-Z][a-z]*
-DESCRIPTION([A-Za-z]" ")*[A-Za-z]
-
-%START EJ ER EU EUF ERF EJF ARM DATE DESC FQ VEVENT
+%START EJ ER EU EUF ERF EJF ARM DATE DESC VEVENT
 %%
 
 BEGIN:VCALENDAR { printf("début calendrier \n"); BEGIN 0;} 
@@ -66,11 +63,10 @@ DTEND;TZID=([A-Z][a-z]*("/"([A-Z][a-z]*(":")))) {printf("intro heure fin evt rep
 <EUF>[0-9]{8}\T[0-9]{6}\Z {printf("date et heure evt unique: %s \n", yytext); BEGIN VEVENT;}
 <ERF>[0-9]{8}("T"([0-9]{6})) {printf("date et heure evt repetitif: %s \n", yytext); BEGIN VEVENT;}
 <EJF>[0-9]{8} {printf("date evt journée: %s \n", yytext); BEGIN VEVENT;}
-
 <DATE>"DTSTART:" {printf("intro heure début evt unique\n"); BEGIN EU;}
 <ARM>"-"([A-Z0-9]*) {printf("position alarme:%s \n", yytext); BEGIN 0;}
 <VEVENT>"DESCRIPTION:" {printf("intro description\n"); BEGIN DESC;}
-
+<DESC>(([0-9]+" "([a-z]" ")*[a-z])"\,"[A-Z][a-z]*)|(([A-Za-z]" ")*[A-Za-z]) {printf("Lieu, description ou titre : %s \n", yytext); BEGIN 0;}
 
 .|\n ;
 %%
